@@ -1,0 +1,20 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    // מי שיש לו את הקישור לאירוע יכול לקרוא ולערוך אותו.
+    // אי אפשר לקבל רשימה של כל האירועים או למחוק אירוע שלם.
+    // תבנית הציוד הבסיסי מהבית — משפיעה רק על אירועים חדשים
+    match /templates/personal {
+      allow read, write: if true;
+    }
+
+    match /events/{eventId} {
+      allow get, create, update: if true;
+      allow list, delete: if false;
+
+      match /{sub}/{docId} {
+        allow read, write: if sub in ['items', 'participants', 'personal'];
+      }
+    }
+  }
+}
